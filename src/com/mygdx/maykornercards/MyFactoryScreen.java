@@ -1,0 +1,1805 @@
+package com.mygdx.maykornercards;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+
+import java.io.*;
+import java.util.*;
+import java.util.List;
+
+
+public class MyFactoryScreen extends ScreenAdapter {
+
+    private boolean debug = false;
+
+    MyGdxGameTwoCards game;
+
+    String eqComparisons = "";
+    String prefix = "; matches: ";
+
+
+    public MyFactoryScreen(final MyGdxGameTwoCards game) {
+
+        this.game = game;
+
+
+
+
+    }
+
+    public void makeCircle(float x, float y, float radius, ShapeRenderer.ShapeType type, Color color){
+
+        game.shapeRenderer.begin(type);
+        game.shapeRenderer.setColor(color);
+        game.shapeRenderer.circle(x, y, radius);
+        game.shapeRenderer.end();
+
+    }
+
+    public void makeRectangle(float x, float y, float width, float height,ShapeRenderer.ShapeType type, Color color){
+
+        game.shapeRenderer.begin(type);
+        game.shapeRenderer.setColor(color);
+        game.shapeRenderer.rect(x, y, width, height);
+        game.shapeRenderer.end();
+
+    }
+
+    public void makeImage(Texture texture, float x, float y, float width, float height){
+
+        game.batch.begin();
+
+        game.batch.draw(texture,
+                x,
+                y,
+                width, height);
+
+        game.batch.end();
+
+    }
+
+    public float checkEdgesCirle(float radiusmin, float zeroedge, float radiusmax, float maxedge, float speed){
+
+        if (radiusmin < zeroedge || radiusmax > maxedge) {
+            speed *= -1;
+            if(com.mygdx.maykornercards.MyStaticItems.playsound){
+                com.mygdx.maykornercards.MyStaticItems.drop.play();}
+        }
+        return speed;
+
+    }
+
+    public void writeData(String msg, String path){
+
+            boolean isExtAvailable = Gdx.files.isExternalStorageAvailable();
+            boolean isLocalAvailable = Gdx.files.isLocalStorageAvailable();
+
+
+        FileHandle filelocal = Gdx.files.local(path);
+        filelocal.file().setWritable(true);
+        FileHandle fileexternal = Gdx.files.external(path);
+        fileexternal.file().setWritable(true);
+
+        if(!filelocal.exists() && isLocalAvailable)
+        {
+            try {
+                filelocal.file().createNewFile();
+                filelocal.writeString ("scores\r\n",false);
+             } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(!fileexternal.exists() && isExtAvailable)
+        {
+            try {
+                fileexternal.file().createNewFile();
+                fileexternal.writeString ("scores\r\n",false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //COMMENT for emulator, works for fone?
+            if(isExtAvailable) {
+
+                fileexternal.writeString(msg+"\r\n", true);
+
+            }
+        //END COMMENT for emulator...
+
+            if(isLocalAvailable) {
+
+                filelocal.writeString(msg+"\r\n", true);
+
+            }
+
+            }
+
+    public void popTextInputPlayer(String title, String text, String hint){
+
+        Input.TextInputListener textListener = new Input.TextInputListener()
+        {
+            @Override
+            public void input(String input)
+            {
+                com.mygdx.maykornercards.MyStaticItems.player = input;//cant extract this for method parameter
+            }
+
+            @Override
+            public void canceled()
+            {
+                //System.out.println("Aborted");
+            }
+        };
+
+       // Gdx.input.getTextInput(textListener, "Your name: ", MyStaticItems.player, "");
+        Gdx.input.getTextInput(textListener, title, text, hint);
+
+    }
+
+    public void popTextInputFileONE(String title, String text, String hint){
+
+        Input.TextInputListener textListener = new Input.TextInputListener()
+        {
+            @Override
+            public void input(String input)
+            {
+                com.mygdx.maykornercards.MyStaticItems.gtxfilenameOne = input;//cant extract this for method parameter
+            }
+
+            @Override
+            public void canceled()
+            {
+                //System.out.println("Aborted");
+            }
+        };
+
+        // Gdx.input.getTextInput(textListener, "Your name: ", MyStaticItems.player, "");
+        Gdx.input.getTextInput(textListener, title, text, hint);
+
+    }
+
+    public void popTextInputFileTWO(String title, String text, String hint){
+
+        Input.TextInputListener textListener = new Input.TextInputListener()
+        {
+            @Override
+            public void input(String input)
+            {
+                com.mygdx.maykornercards.MyStaticItems.gtxfilenameTwo = input;//cant extract this for method parameter
+            }
+
+            @Override
+            public void canceled()
+            {
+                //System.out.println("Aborted");
+            }
+        };
+
+        // Gdx.input.getTextInput(textListener, "Your name: ", MyStaticItems.player, "");
+        Gdx.input.getTextInput(textListener, title, text, hint);
+
+    }
+
+    public void popTextInputFileIMAGE(String title, String text, String hint){
+
+        Input.TextInputListener textListener = new Input.TextInputListener()
+        {
+            @Override
+            public void input(String input)
+            {
+                com.mygdx.maykornercards.MyStaticItems.gtximagename = input;//cant extract this for method parameter
+                com.mygdx.maykornercards.MyStaticItems.gtximage = new Texture(com.mygdx.maykornercards.MyStaticItems.gtximagename);           }
+
+            @Override
+            public void canceled()
+            {
+                //System.out.println("Aborted");
+            }
+        };
+
+        // Gdx.input.getTextInput(textListener, "Your name: ", MyStaticItems.player, "");
+        Gdx.input.getTextInput(textListener, title, text, hint);
+
+    }
+
+    public String getFromFile(String file){
+
+        FileHandle handle;
+        FileHandle [] filehandles;
+        filehandles=Gdx.files.internal("").list();//gets "data" files!, so try path: ""
+
+        String text = com.mygdx.maykornercards.MyStaticItems.cantfind;//here if cant find that file
+            if(file != "" && file != null && !file.isEmpty()){
+                handle = Gdx.files.internal(file);
+                 if(handle.exists()) {
+                    text = handle.readString();
+                    //text=handle.parent().name()+handle.path();//dbug shows me path of internal file in assets
+                 }
+            }else{
+                text = "filehandles.length="+filehandles.length;//here, if found no files
+                text = getHandles(filehandles);//get dir listing
+            }
+
+        if(text== com.mygdx.maykornercards.MyStaticItems.cantfind){
+            if(com.mygdx.maykornercards.MyStaticItems.playsound) {
+                com.mygdx.maykornercards.MyStaticItems.ahahahID = com.mygdx.maykornercards.MyStaticItems.ahahah.play();//can play once here cause its in show methpod as this.getfromfile is called from GTXTwo
+                //MyStaticItems.ahahah.setLooping(MyStaticItems.ahahahID, false);
+            }
+        }
+
+        return text;
+    }
+
+    public String checkFile(String file){
+
+        FileHandle handle;
+        FileHandle [] filehandles;
+        filehandles=Gdx.files.internal("").list();//gets "data" files!, so try path: ""
+
+        String text = com.mygdx.maykornercards.MyStaticItems.cantfind;//here if cant find that file
+        if(file != "" && file != null && !file.isEmpty()){
+            handle = Gdx.files.internal(file);
+            if(handle.exists()) {
+                text = com.mygdx.maykornercards.MyStaticItems.fileexists;
+                //text=handle.parent().name()+handle.path();//dbug shows me path of internal file in assets
+            }
+        }else{
+            text = "filehandles.length="+filehandles.length;//here, if found no files
+            //text = getHandles(filehandles);//get dir listing
+            text = com.mygdx.maykornercards.MyStaticItems.getdirscreen;
+        }
+
+        if(text== com.mygdx.maykornercards.MyStaticItems.cantfind){
+            //MyStaticItems.ahahahID=MyStaticItems.ahahah.play();//only play here, dont place here casue its called in render mthod GTXTWOb
+            //MyStaticItems.ahahah.setLooping(MyStaticItems.ahahahID, false);
+        }
+
+        return text;
+    }
+
+    public String getHandles(FileHandle[] filehandles){
+        String text = "";
+        FileHandle [] filehandlesdir;
+
+        for (int i=0; i< filehandles.length; i++){
+
+            if (filehandles[i].isDirectory())
+            {
+               filehandlesdir=Gdx.files.internal(filehandles[i].name()).list();//recursion dont wotrk
+               text += getHandles(filehandlesdir);
+            }
+
+            text += filehandles[i].name()+"\r\n";
+
+        }
+
+        return text;
+    }
+
+    public String getLinesFromFile(String file, int linenumberstart, int linenumberend) throws IOException {
+        //String text = "";
+        int lineNumber = 0;
+
+        LineNumberReader lineNumberReader =
+                new LineNumberReader(new FileReader(file));
+
+        lineNumberReader.setLineNumber(linenumberstart);
+
+        int data = lineNumberReader.read();
+        while(data != -1){
+            char dataChar = (char) data;
+            data += lineNumberReader. read();
+            lineNumber += 1/*lineNumberReader.getLineNumber()*/;
+            if(lineNumber<=linenumberend){
+                continue;
+            }
+            else{
+                break;
+            }
+        }
+        lineNumberReader.close();
+
+        return new String(String.valueOf(data));
+    }
+
+    public void showtextPlain(String file, int x, int y) {
+
+        String text = getFromFile(file);
+
+        game.batch.begin();
+        game.newfont3.draw(game.batch, text,x, y);
+        game.batch.end();
+
+    }
+
+    public TextArea createtextarea (String filename, Skin skin, float x, float y, float width, float height)
+    {
+        TextArea textArea = new TextArea(getFromFile(filename), skin);
+        textArea.setName(filename);
+        textArea.setX(x);
+        textArea.setY(y);
+        textArea.setWidth(width);
+        textArea.setHeight(height);
+       textArea.setDisabled(true);
+
+        return textArea;
+    }
+
+    public Table createtable(float x, float y, float width, float height){
+
+        Table table = new Table();
+        table.setX(x);
+        table.setY(y);
+        table.setWidth(width);
+        table.setHeight(height);
+
+        return table;
+    }
+
+    public ScrollPane createscrollpane(TextArea textarea, Skin skin, float x, float y, float width, float height,
+                                       boolean flick, boolean forcex, boolean forcey){
+
+        final ScrollPane scrollPane = new ScrollPane(textarea, skin);
+        scrollPane.layout();
+        scrollPane.setX(x);
+        scrollPane.setY(y);
+        scrollPane.setWidth(width);
+        scrollPane.setHeight(height);
+        scrollPane.setFlickScroll(flick);
+        scrollPane.setForceScroll(forcex,forcey);
+        scrollPane.setScrollingDisabled(false, false);
+
+        return scrollPane;
+    }
+
+    public String getdebug(){
+
+        String debug = "x: "+game.debugx+/*" y: "+game.debugy+ */" rY: "+game.debugrenderY
+                /*
+            +
+                            " scX: "+game.debugscreenX+" scY: "+game.debugscreenY*/
+                            /*+
+                   " extpath: "+Gdx.files.getExternalStoragePath()*/
+                + " W,/2: "+Gdx.graphics.getWidth() + " " + Gdx.graphics.getWidth()/2  + " H,/2: "+Gdx.graphics.getHeight() + " " + Gdx.graphics.getHeight()/2
+                            /*+ " subH:" + MyStaticItems.trademark.getHeight()+ " T: "
+                            +(Gdx.graphics.getHeight()-MyStaticItems.trademark.getHeight())*/
+
+                ;
+                return debug;
+    }
+
+    public ArrayList<String> getFilesList(String frontmask, String[] endmasks) {
+        ArrayList<String> arl = new ArrayList<String>();
+
+        FileHandle [] filehandles;
+        filehandles=Gdx.files.internal("").list();//gets "data" files!, so try path: ""
+
+        boolean myfile = false;
+        for (int i=0; i< filehandles.length; i++) {
+            String name = filehandles[i].name();
+            if (name.startsWith(frontmask)) {
+                for (int j = 0; j < endmasks.length; j++) {
+                    if (name.endsWith(endmasks[j])) {
+                        myfile = true;
+                    }
+                }
+            }
+            if(myfile)
+            {
+                arl.add(filehandles[i].name());
+                myfile = false;
+            }
+        }
+
+        Collections.sort(arl);
+
+        return arl;
+    }
+
+    /*
+            back1 = atlas.createSprite("back", 2);
+        //front.setSize(MyStaticItems.CARD_WIDTH, MyStaticItems.CARD_HEIGHT);
+        back1.setPosition(cardx, cardy);
+        cardx += MyStaticItems.cardwidth;
+        //overlap += MyStaticItems.cardoverlap;//1st overlp is belo
+     */
+    public Sprite createcardsprite(TextureAtlas atlas, Sprite sprite, String atlasname, int atlasindex,
+                                   float cardx, float cardy/*, float overlap*/){
+
+        sprite = atlas.createSprite(atlasname,atlasindex);
+        sprite.setPosition(cardx, cardy);
+
+        return sprite;
+    }
+
+    /*
+              if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                back1.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                //overlap += MyStaticItems.cardoverlap;//1st overlp is belo
+            }
+
+     */
+    public int makeCardR1(int debugwhilecounter, float testsubject, float testconstraint, Sprite sprite) {
+
+        if(testsubject < testconstraint) {
+            sprite.draw(game.batch);
+            debugwhilecounter += 1;
+        }
+
+        return debugwhilecounter;
+
+        }
+
+    /**
+     * Uses String.split functionality in order to fill <code>ArrayList</code>
+     * with empty Strings, if no <code>tokens</code> after a
+     * <code>delimiter</code>
+     *
+     * @return
+     */
+    public static ArrayList<String> Split(String fullstring, String delimstring) {
+        //Token works on "^", fails on "," so use Split mostly; also Token works on "\r\n"
+        //Token works on "|" not Split "|"
+
+        ArrayList<String> arrlist = new ArrayList<String>();
+
+        String[] s = fullstring.split(delimstring, -1);
+        for (int i=0;i<s.length;i++)
+        {
+            arrlist.add(s[i].trim());
+        }
+
+        return (arrlist);
+    }
+
+    /*
+    Returns:
+a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+     */
+    public <K, V extends Comparable<V>> Map.Entry<K, V> maxUsingIteration(Map<K, V> map) {
+
+        Map.Entry<K, V> maxEntry = null;
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (maxEntry == null || entry.getValue()
+                    .compareTo(maxEntry.getValue()) > 0) {
+                maxEntry = entry;
+            }
+         }
+           return maxEntry;
+    }
+
+    /*
+   Returns:
+a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+    */
+    public <K, V extends Comparable<V>> Map.Entry<K, V> maxUsingIterationWithMatches(Map<K, V> map) {
+        eqComparisons = "";
+
+        Map.Entry<K, V> maxEntry = null;
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (maxEntry == null || entry.getValue()
+                    .compareTo(maxEntry.getValue()) > 0) {
+                maxEntry = entry;
+                for (Map.Entry<K, V> entry2 : map.entrySet()) {
+                    if (maxEntry == null || entry2.getValue()
+                            .compareTo(maxEntry.getValue()) == 0) {
+                        eqComparisons += ", " +  entry.getKey();
+                    }
+
+                }
+            }
+        }
+        return maxEntry;
+    }
+
+    public <K, V extends Comparable<V>> void maxUsingIterationMatches(Map<K, V> map) {
+         eqComparisons = "";
+
+        Map.Entry<K, V> maxEntry = null;
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+             if (maxEntry == null || entry.getValue()
+                    .compareTo(maxEntry.getValue()) == 0) {
+                 maxEntry = entry;
+                 eqComparisons += " " + maxEntry.getKey() + " matches " + entry.getKey();
+            }
+        }
+
+     }
+//====================CARDS====================
+    public void setTypesofSuits(List<String> givenListAllCards, int whichindexAllCards){
+        String element = "";
+        String suit = "";
+        ArrayList<String> arl;
+
+        for(int i=0; i<givenListAllCards.size(); i++){
+            element = givenListAllCards.get(i);
+            arl = Split(element,",");
+            suit = arl.get(whichindexAllCards);
+                if(!com.mygdx.maykornercards.MyStaticItems.arlTypesofSuits.contains(suit)) {
+                   com.mygdx.maykornercards.MyStaticItems.arlTypesofSuits.add(suit);
+            }
+        }
+         if(debug){System.out.println("allcards "+givenListAllCards.toString());}
+         //MyStaticItems.arlTypesofSuits = null;//reset here
+    }
+
+    public void setTypesofPips(List<String> givenListAllCards, int whichindexAllCards){
+        String element = "";
+        int pip = 0;
+        ArrayList<String> arl;
+
+        for(int i=0; i<givenListAllCards.size(); i++){
+            element = givenListAllCards.get(i);
+            arl = Split(element,",");
+            pip = Integer.valueOf(arl.get(whichindexAllCards));
+            if(!com.mygdx.maykornercards.MyStaticItems.arlTypesofPips.contains(pip)) {
+                com.mygdx.maykornercards.MyStaticItems.arlTypesofPips.add(pip);
+            }
+        }
+
+
+        //MyStaticItems.arlTypesofPips = null;//reset here
+    }
+
+    public void countCardsbySuit1(ArrayList<String> arlsuit/*, List<String> givenListAllCards, int whichindexAllCards*/, int limitofcount) {
+        com.mygdx.maykornercards.MyStaticItems.maxSuit1 = "";//reset
+        int clubs = 0;
+        int hearts = 0;
+        int spades = 0;
+        int diamonds = 0;
+
+        Map.Entry<String, Integer> maxEntry = null;
+
+        for (int i=0; i<limitofcount; i++){
+                     if("clubs".equalsIgnoreCase(arlsuit.get(i))){
+                         clubs+=1;
+                     }
+                      if("hearts".equalsIgnoreCase(arlsuit.get(i))){
+                         hearts+=1;
+                     }
+                      if("spades".equalsIgnoreCase(arlsuit.get(i))){
+                         spades+=1;
+                     }
+                      if("diamonds".equalsIgnoreCase(arlsuit.get(i))){
+                         diamonds+=1;
+                     }
+            }
+
+
+        HashMap<String, Integer> sums = new HashMap<String, Integer>();
+        sums.put("clubs" , clubs);
+        sums.put("hearts" , hearts);
+        sums.put("spades" , spades);
+        sums.put("diamonds" , diamonds);
+        maxEntry = maxUsingIteration(sums);
+        com.mygdx.maykornercards.MyStaticItems.maxSuit1 = maxEntry.getValue() + " " + maxEntry.getKey();
+
+        getSuffixSuit("maxSuit1", maxEntry, clubs, hearts, spades, diamonds);
+
+    }
+
+      private void getSuffixSuit(String maxSuit, Map.Entry<String, Integer> maxEntry, int clubs, int hearts, int spades, int diamonds) {
+
+        String suffix = "";
+        int suflength = suffix.length();
+        if(maxEntry.getKey().equalsIgnoreCase("clubs")){
+            if (clubs == hearts){suffix+=" hearts";}
+            if (clubs == spades){suffix+=" spades";}
+            if (clubs == diamonds){suffix+=" diamonds";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("hearts")){
+            if (hearts == clubs){suffix+=" clubs";}
+            if (hearts == spades){suffix+=" spades";}
+            if (hearts == diamonds){suffix+=" diamonds";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("spades")){
+            if (spades == clubs){suffix+=" clubs";}
+            if (spades == hearts){suffix+=" hearts";}
+            if (spades == diamonds){suffix+=" diamonds";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("diamonds")){
+            if (diamonds == clubs){suffix+=" clubs";}
+            if (diamonds == hearts){suffix+=" hearts";}
+            if (diamonds == spades){suffix+=" spades";}
+        }
+
+        if (maxSuit.equalsIgnoreCase("maxSuit1")) {
+            if (suffix.length() > suflength) {
+                com.mygdx.maykornercards.MyStaticItems.maxSuit1 += suffix;
+            }
+        }
+          if (maxSuit.equalsIgnoreCase("maxSuit2")) {
+              if (suffix.length() > suflength) {
+                  com.mygdx.maykornercards.MyStaticItems.maxSuit2 += suffix;
+              }
+          }
+
+      }
+
+    public void countCardsbyPip1(ArrayList<Integer> arlpip/*, List<String> givenListAllCards, int whichindexAllCards*/, int limitofcount) {
+        com.mygdx.maykornercards.MyStaticItems.maxPip1 = "";//reset
+        int iA = 0;
+        int i2 = 0;
+        int i3 = 0;
+        int i4 = 0;
+        int i5 = 0;
+        int i6 = 0;
+        int i7 = 0;
+        int i8 = 0;
+        int i9 = 0;
+        int i10 = 0;
+        int iJ = 0;
+        int iQ = 0;
+        int iK = 0;
+
+        Map.Entry<String, Integer> maxEntry = null;
+
+        for (int i=0; i<limitofcount; i++){
+            if(1 == (arlpip.get(i))){
+                iA+=1;
+            }
+            if(2 == (arlpip.get(i))){
+                i2+=1;
+            }
+            if(3 == (arlpip.get(i))){
+                i3+=1;
+            }
+            if(4 == (arlpip.get(i))){
+                i4+=1;
+            }
+            if(5 == (arlpip.get(i))){
+                i5+=1;
+            }
+            if(6 == (arlpip.get(i))){
+                i6+=1;
+            }
+            if(7 == (arlpip.get(i))){
+                i7+=1;
+            }
+            if(8 == (arlpip.get(i))){
+                i8+=1;
+            }
+            if(9 == (arlpip.get(i))){
+                i9+=1;
+            }
+            if(10 == (arlpip.get(i))){
+                i10+=1;
+            }
+            if(11 == (arlpip.get(i))){
+                iJ+=1;
+            }
+            if(12 == (arlpip.get(i))){
+                iQ+=1;
+            }
+            if(13 == (arlpip.get(i))){
+                iK+=1;
+            }
+        }
+
+
+        HashMap<String, Integer> sums = new HashMap<String, Integer>();
+        sums.put("As" , iA);
+        sums.put("2s" , i2);
+        sums.put("3s" , i3);
+        sums.put("4s" , i4);
+        sums.put("5s" , i5);
+        sums.put("6s" , i6);
+        sums.put("7s" , i7);
+        sums.put("8s" , i8);
+        sums.put("9s" , i9);
+        sums.put("10s" , i10);
+        sums.put("Js" , iJ);
+        sums.put("Qs" , iQ);
+        sums.put("Ks" , iK);
+        maxEntry = maxUsingIteration(sums);
+        com.mygdx.maykornercards.MyStaticItems.maxPip1 = maxEntry.getValue() + " " + maxEntry.getKey();
+
+        getSuffixPip("maxPip1", maxEntry, iA, i2, i3, i4, i5, i6, i7, i8, i9, i10, iJ, iQ, iK);
+
+    }
+
+    private void getSuffixPip(String maxPip, Map.Entry<String, Integer> maxEntry, int iA, int i2, int i3, int i4, int i5,
+                              int i6, int i7, int i8, int i9, int i10, int iJ, int iQ, int iK) {
+
+        String suffix = "";
+        int suflength = suffix.length();
+        if(maxEntry.getKey().equalsIgnoreCase("As")){
+            if (iA == i2){suffix+=" 2s";}
+            if (iA == i3){suffix+=" 3s";}
+            if (iA == i4){suffix+=" 4s";}
+            if (iA == i5){suffix+=" 5s";}
+            if (iA == i6){suffix+=" 6s";}
+            if (iA == i7){suffix+=" 7s";}
+            if (iA == i8){suffix+=" 8s";}
+            if (iA == i9){suffix+=" 9s";}
+            if (iA == i10){suffix+=" 10s";}
+            if (iA == iJ){suffix+=" Js";}
+            if (iA == iQ){suffix+=" Qs";}
+            if (iA == iK){suffix+=" Ks";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("2s")){
+               if (i2 == i3){suffix+=" 3s";}
+            if (i2 == i4){suffix+=" 4s";}
+            if (i2 == i5){suffix+=" 5s";}
+            if (i2 == i6){suffix+=" 6s";}
+            if (i2 == i7){suffix+=" 7s";}
+            if (i2 == i8){suffix+=" 8s";}
+            if (i2 == i9){suffix+=" 9s";}
+            if (i2 == i10){suffix+=" 10s";}
+            if (i2 == iJ){suffix+=" Js";}
+            if (i2 == iQ){suffix+=" Qs";}
+            if (i2 == iK){suffix+=" Ks";}
+            if (i2 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("3s")){
+            if (i3 == i2){suffix+=" 2s";}
+             if (i3 == i4){suffix+=" 4s";}
+            if (i3 == i5){suffix+=" 5s";}
+            if (i3 == i6){suffix+=" 6s";}
+            if (i3 == i7){suffix+=" 7s";}
+            if (i3 == i8){suffix+=" 8s";}
+            if (i3 == i9){suffix+=" 9s";}
+            if (i3 == i10){suffix+=" 10s";}
+            if (i3 == iJ){suffix+=" Js";}
+            if (i3 == iQ){suffix+=" Qs";}
+            if (i3 == iK){suffix+=" Ks";}
+            if (i3 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("4s")){
+            if (i4 == i2){suffix+=" 2s";}
+            if (i4 == i3){suffix+=" 3s";}
+            if (i4 == i5){suffix+=" 5s";}
+            if (i4 == i6){suffix+=" 6s";}
+            if (i4 == i7){suffix+=" 7s";}
+            if (i4 == i8){suffix+=" 8s";}
+            if (i4 == i9){suffix+=" 9s";}
+            if (i4 == i10){suffix+=" 10s";}
+            if (i4 == iJ){suffix+=" Js";}
+            if (i4 == iQ){suffix+=" Qs";}
+            if (i4 == iK){suffix+=" Ks";}
+            if (i4 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("5s")){
+            if (i5 == i2){suffix+=" 2s";}
+            if (i5 == i3){suffix+=" 3s";}
+            if (i5 == i4){suffix+=" 4s";}
+            if (i5 == i6){suffix+=" 6s";}
+            if (i5 == i7){suffix+=" 7s";}
+            if (i5 == i8){suffix+=" 8s";}
+            if (i5 == i9){suffix+=" 9s";}
+            if (i5 == i10){suffix+=" 10s";}
+            if (i5 == iJ){suffix+=" Js";}
+            if (i5 == iQ){suffix+=" Qs";}
+            if (i5 == iK){suffix+=" Ks";}
+            if (i5 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("6s")){
+            if (i6 == i2){suffix+=" 2s";}
+            if (i6 == i3){suffix+=" 3s";}
+            if (i6 == i4){suffix+=" 4s";}
+            if (i6 == i5){suffix+=" 5s";}
+            if (i6 == i7){suffix+=" 7s";}
+            if (i6 == i8){suffix+=" 8s";}
+            if (i6 == i9){suffix+=" 9s";}
+            if (i6 == i10){suffix+=" 10s";}
+            if (i6 == iJ){suffix+=" Js";}
+            if (i6 == iQ){suffix+=" Qs";}
+            if (i6 == iK){suffix+=" Ks";}
+            if (i6 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("7s")){
+            if (i7 == i2){suffix+=" 2s";}
+            if (i7 == i3){suffix+=" 3s";}
+            if (i7 == i4){suffix+=" 4s";}
+            if (i7 == i5){suffix+=" 5s";}
+            if (i7 == i6){suffix+=" 6s";}
+            if (i7 == i8){suffix+=" 8s";}
+            if (i7 == i9){suffix+=" 9s";}
+            if (i7 == i10){suffix+=" 10s";}
+            if (i7 == iJ){suffix+=" Js";}
+            if (i7 == iQ){suffix+=" Qs";}
+            if (i7 == iK){suffix+=" Ks";}
+            if (i7 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("8s")){
+            if (i8 == i2){suffix+=" 2s";}
+            if (i8 == i3){suffix+=" 3s";}
+            if (i8 == i4){suffix+=" 4s";}
+            if (i8 == i5){suffix+=" 5s";}
+            if (i8 == i6){suffix+=" 6s";}
+            if (i8 == i7){suffix+=" 7s";}
+            if (i8 == i9){suffix+=" 9s";}
+            if (i8 == i10){suffix+=" 10s";}
+            if (i8 == iJ){suffix+=" Js";}
+            if (i8 == iQ){suffix+=" Qs";}
+            if (i8 == iK){suffix+=" Ks";}
+            if (i8 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("9s")){
+            if (i9 == i2){suffix+=" 2s";}
+            if (i9 == i3){suffix+=" 3s";}
+            if (i9 == i4){suffix+=" 4s";}
+            if (i9 == i5){suffix+=" 5s";}
+            if (i9 == i6){suffix+=" 6s";}
+            if (i9 == i7){suffix+=" 7s";}
+            if (i9 == i8){suffix+=" 8s";}
+            if (i9 == i10){suffix+=" 10s";}
+            if (i9 == iJ){suffix+=" Js";}
+            if (i9 == iQ){suffix+=" Qs";}
+            if (i9 == iK){suffix+=" Ks";}
+            if (i9 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("10s")){
+            if (i10 == i2){suffix+=" 2s";}
+            if (i10 == i3){suffix+=" 3s";}
+            if (i10 == i4){suffix+=" 4s";}
+            if (i10 == i5){suffix+=" 5s";}
+            if (i10 == i6){suffix+=" 6s";}
+            if (i10 == i7){suffix+=" 7s";}
+            if (i10 == i8){suffix+=" 8s";}
+            if (i10 == i9){suffix+=" 9s";}
+             if (i10 == iJ){suffix+=" Js";}
+            if (i10 == iQ){suffix+=" Qs";}
+            if (i10 == iK){suffix+=" Ks";}
+            if (i10 == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("Js")){
+            if (iJ == i2){suffix+=" 2s";}
+            if (iJ == i3){suffix+=" 3s";}
+            if (iJ == i4){suffix+=" 4s";}
+            if (iJ == i5){suffix+=" 5s";}
+            if (iJ == i6){suffix+=" 6s";}
+            if (iJ == i7){suffix+=" 7s";}
+            if (iJ == i8){suffix+=" 8s";}
+            if (iJ == i9){suffix+=" 9s";}
+            if (iJ == i10){suffix+=" 10s";}
+            if (iJ == iQ){suffix+=" Qs";}
+            if (iJ == iK){suffix+=" Ks";}
+            if (iJ == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("Qs")){
+            if (iQ == i2){suffix+=" 2s";}
+            if (iQ == i3){suffix+=" 3s";}
+            if (iQ == i4){suffix+=" 4s";}
+            if (iQ == i5){suffix+=" 5s";}
+            if (iQ == i6){suffix+=" 6s";}
+            if (iQ == i7){suffix+=" 7s";}
+            if (iQ == i8){suffix+=" 8s";}
+            if (iQ == i9){suffix+=" 9s";}
+            if (iQ == i10){suffix+=" 10s";}
+            if (iQ == iJ){suffix+=" Js";}
+             if (iQ == iK){suffix+=" Ks";}
+            if (iQ == iA){suffix+=" As";}
+        }
+        if(maxEntry.getKey().equalsIgnoreCase("Ks")){
+            if (iK == i2){suffix+=" 2s";}
+            if (iK == i3){suffix+=" 3s";}
+            if (iK == i4){suffix+=" 4s";}
+            if (iK == i5){suffix+=" 5s";}
+            if (iK == i6){suffix+=" 6s";}
+            if (iK == i7){suffix+=" 7s";}
+            if (iK == i8){suffix+=" 8s";}
+            if (iK == i9){suffix+=" 9s";}
+            if (iK == i10){suffix+=" 10s";}
+            if (iK == iJ){suffix+=" Js";}
+             if (iK == iQ){suffix+=" Qs";}
+            if (iK == iA){suffix+=" As";}
+        }
+
+        if (maxPip.equalsIgnoreCase("maxPip1")) {
+            if (suffix.length() > suflength) {
+                com.mygdx.maykornercards.MyStaticItems.maxPip1 += suffix;
+            }
+        }
+        if (maxPip.equalsIgnoreCase("maxPip2")) {
+            if (suffix.length() > suflength) {
+                com.mygdx.maykornercards.MyStaticItems.maxPip2 += suffix;
+            }
+        }
+
+    }
+
+    public void countCardsbySuit2(ArrayList<String> arlsuit/*, List<String> givenListAllCards, int whichindexAllCards*/, int limitofcount) {
+        com.mygdx.maykornercards.MyStaticItems.maxSuit2 = "";//reset
+
+        int clubs = 0;
+        int hearts = 0;
+        int spades = 0;
+        int diamonds = 0;
+
+        Map.Entry<String, Integer> maxEntry = null;
+
+        for (int i=0; i<limitofcount; i++){
+            if("clubs".equalsIgnoreCase(arlsuit.get(i))){
+                clubs+=1;
+            }
+            if("hearts".equalsIgnoreCase(arlsuit.get(i))){
+                hearts+=1;
+            }
+            if("spades".equalsIgnoreCase(arlsuit.get(i))){
+                spades+=1;
+            }
+            if("diamonds".equalsIgnoreCase(arlsuit.get(i))){
+                diamonds+=1;
+            }
+        }
+
+
+        HashMap<String, Integer> sums = new HashMap<String, Integer>();
+        sums.put("clubs" , clubs);
+        sums.put("hearts" , hearts);
+        sums.put("spades" , spades);
+        sums.put("diamonds" , diamonds);
+        maxEntry = maxUsingIteration(sums);
+        com.mygdx.maykornercards.MyStaticItems.maxSuit2 = maxEntry.getValue() + " " + maxEntry.getKey();
+
+        getSuffixSuit("maxSuit2", maxEntry, clubs, hearts, spades, diamonds);
+
+    }
+
+    public void countCardsbyPip2(ArrayList<Integer> arlpip/*, List<String> givenListAllCards, int whichindexAllCards*/, int limitofcount) {
+        com.mygdx.maykornercards.MyStaticItems.maxPip2 = "";//reset
+        int iA = 0;
+        int i2 = 0;
+        int i3 = 0;
+        int i4 = 0;
+        int i5 = 0;
+        int i6 = 0;
+        int i7 = 0;
+        int i8 = 0;
+        int i9 = 0;
+        int i10 = 0;
+        int iJ = 0;
+        int iQ = 0;
+        int iK = 0;
+
+        Map.Entry<String, Integer> maxEntry = null;
+
+        for (int i=0; i<limitofcount; i++){
+            if(1 == (arlpip.get(i))){
+                iA+=1;
+            }
+            if(2 == (arlpip.get(i))){
+                i2+=1;
+            }
+            if(3 == (arlpip.get(i))){
+                i3+=1;
+            }
+            if(4 == (arlpip.get(i))){
+                i4+=1;
+            }
+            if(5 == (arlpip.get(i))){
+                i5+=1;
+            }
+            if(6 == (arlpip.get(i))){
+                i6+=1;
+            }
+            if(7 == (arlpip.get(i))){
+                i7+=1;
+            }
+            if(8 == (arlpip.get(i))){
+                i8+=1;
+            }
+            if(9 == (arlpip.get(i))){
+                i9+=1;
+            }
+            if(10 == (arlpip.get(i))){
+                i10+=1;
+            }
+            if(11 == (arlpip.get(i))){
+                iJ+=1;
+            }
+            if(12 == (arlpip.get(i))){
+                iQ+=1;
+            }
+            if(13 == (arlpip.get(i))){
+                iK+=1;
+            }
+        }
+
+
+        HashMap<String, Integer> sums = new HashMap<String, Integer>();
+        sums.put("As" , iA);
+        sums.put("2s" , i2);
+        sums.put("3s" , i3);
+        sums.put("4s" , i4);
+        sums.put("5s" , i5);
+        sums.put("6s" , i6);
+        sums.put("7s" , i7);
+        sums.put("8s" , i8);
+        sums.put("9s" , i9);
+        sums.put("10s" , i10);
+        sums.put("Js" , iJ);
+        sums.put("Qs" , iQ);
+        sums.put("Ks" , iK);
+        maxEntry = maxUsingIteration(sums);
+        com.mygdx.maykornercards.MyStaticItems.maxPip2 = maxEntry.getValue() + " " + maxEntry.getKey();
+
+        getSuffixPip("maxPip2", maxEntry, iA, i2, i3, i4, i5, i6, i7, i8, i9, i10, iJ, iQ, iK);
+
+    }
+
+    public void getHighCard1(ArrayList<Integer> arlPip, int limitofcount) {
+
+        int high = 0;
+
+        //so dont corrupt arlPip by reference
+        ArrayList<Integer> arl = arlPip;
+
+        List<Integer> list = new ArrayList<Integer>();
+        for(int i=0; i<limitofcount; i++){
+            if(arl.get(i)==1){arl.set(i,14);}
+            list.add(arl.get(i));
+         }
+
+        high = Collections.max(list);
+
+        if (high==14){
+            com.mygdx.maykornercards.MyStaticItems.HighCard1="A";}
+        else if (high==11){
+            com.mygdx.maykornercards.MyStaticItems.HighCard1="J";}
+        else if (high==12){
+            com.mygdx.maykornercards.MyStaticItems.HighCard1="Q";}
+        else if (high==13){
+            com.mygdx.maykornercards.MyStaticItems.HighCard1="K";}
+        else{
+            com.mygdx.maykornercards.MyStaticItems.HighCard1=Integer.valueOf(high).toString();}
+
+        //reset A
+        for(int i=0; i<limitofcount; i++){
+            if(arl.get(i)==14){arl.set(i,1);}
+            list.add(arl.get(i));
+        }
+
+    }
+
+    public void getHighCard2(ArrayList<Integer> arlPip, int limitofcount) {
+
+        int high = 0;
+
+        //so dont corrupt arlPip by reference
+        ArrayList<Integer> arl = arlPip;
+
+        List<Integer> list = new ArrayList<Integer>();
+        for(int i=0; i<limitofcount; i++) {
+            if(arl.get(i)==1){arl.set(i,14);}
+            list.add(arl.get(i));
+        }
+
+        high = Collections.max(list);
+
+        if (high==14){
+            com.mygdx.maykornercards.MyStaticItems.HighCard2="A";}
+        else if (high==11){
+            com.mygdx.maykornercards.MyStaticItems.HighCard2="J";}
+        else if (high==12){
+            com.mygdx.maykornercards.MyStaticItems.HighCard2="Q";}
+        else if (high==13){
+            com.mygdx.maykornercards.MyStaticItems.HighCard2="K";}
+        else{
+            com.mygdx.maykornercards.MyStaticItems.HighCard2=Integer.valueOf(high).toString();}
+
+        //reset A
+        for(int i=0; i<limitofcount; i++){
+            if(arl.get(i)==14){arl.set(i,1);}
+            list.add(arl.get(i));
+        }
+
+    }
+
+    public void getCountCard1(ArrayList<Integer> arlPip, int limitofcount) {
+
+        int count = 0;
+
+        for (int i=0; i<limitofcount; i++){
+           if(arlPip.get(i)==1){count += 11;}
+           else if(arlPip.get(i)==11 || arlPip.get(i)==12 || arlPip.get(i)==13){count += 10;}
+            else{count += arlPip.get(i);}
+        }
+
+       com.mygdx.maykornercards.MyStaticItems.CountCard1 = Integer.valueOf(count).toString();
+    }
+
+    public void getCountCard2(ArrayList<Integer> arlPip, int limitofcount) {
+
+        int count = 0;
+
+        for (int i=0; i<limitofcount; i++){
+            if(arlPip.get(i)==1){count += 11;}
+            else if(arlPip.get(i)==11 || arlPip.get(i)==12 || arlPip.get(i)==13){count += 10;}
+            else{count += arlPip.get(i);}
+        }
+
+        com.mygdx.maykornercards.MyStaticItems.CountCard2 = Integer.valueOf(count).toString();
+
+    }
+
+    public void getStraight1(ArrayList<Integer> arlPip, int limitofcount) {
+        com.mygdx.maykornercards.MyStaticItems.Straight1 = "";
+        //debug
+        int lowA = 0;
+        int highA = 0;
+
+        boolean straight = false;
+        int card1 = 0;
+        int card2 = 0;
+        int card3 = 0;
+        int card4 = 0;
+        int card5 = 0;
+
+
+        //Integer [] tests = new Integer[limitofcount];
+        ArrayList<Integer> arl = new ArrayList<Integer>();
+        for(int i = 0; i<limitofcount; i++){
+            arl.add(arlPip.get(i));//use new arl so dont corrupt arlPip
+        }
+        //to solve not finding str8 if pairs, get rid of dups?!
+        // Create a new ArrayList
+        ArrayList<Integer> newList = new ArrayList<Integer>();
+
+        // Traverse through the first list
+        for (int i=0; i<arl.size(); i++) {
+
+            // If this element is not present in newList
+            // then add it
+            if (!newList.contains(arl.get(i))) {
+
+                newList.add(arl.get(i));
+            }
+        }
+        Collections.sort(newList);
+
+        //find A
+        boolean foundA = false;
+        for(int i=0; i<newList.size(); i++){
+            if (newList.get(i)==1){
+                newList.add(14);
+                //limitofcount+=1;
+                //debug
+                lowA = newList.get(i);
+                highA = newList.get(newList.size()-1);
+
+                foundA = true;
+                break;//do once
+            }
+        }
+
+        if(foundA){
+            limitofcount++;//not ndd using dupl-removd list
+        }
+
+        //if pairs in pip run wil not find str8: 5 66 7 8 99 10
+        //                                       1 2F
+        //                                          1 2 3 4F
+        for(int i = 0; i<newList.size()-4; i++){// 6 7 8 9 10
+
+                if(
+                           newList.get(i)+1 == newList.get(i+1)
+                           &&  newList.get(i)+2 == newList.get(i+2)
+                           &&  newList.get(i)+3 == newList.get(i+3)
+                           &&  newList.get(i)+4 == newList.get(i+4)
+                           //&&  arl.get(i)+4 == arl.get(i+5)
+
+                ){
+                    straight = true;
+                    card1=arl.get(i);
+                    card2=arl.get(i+1);
+                    card3=arl.get(i+2);
+                    card4=arl.get(i+3);
+                    card5=arl.get(i+4);
+
+                }
+
+        }
+
+         if(straight){
+            com.mygdx.maykornercards.MyStaticItems.Straight1="str8"
+                    //debug
+                    /*
+                    + " " + card1
+                    + " " + card2
+                    + " " + card3
+                    + " " + card4
+                    + " " + card5
+
+                     */
+            ;
+
+            //debug
+            //if(foundA){MyStaticItems.Straight1+= "; " + limitofcount + " " + lowA + " " + highA;}
+        }
+    }
+
+    public void getStraight2(ArrayList<Integer> arlPip, int limitofcount) {
+        com.mygdx.maykornercards.MyStaticItems.Straight2 = "";
+        boolean foundA = false;
+        //debug
+        int lowA = 0;
+        int highA = 0;
+
+        boolean straight = false;
+        int card1 = 0;
+        int card2 = 0;
+        int card3 = 0;
+        int card4 = 0;
+        int card5 = 0;
+
+
+        //Integer [] tests = new Integer[limitofcount];
+        ArrayList<Integer> arl = new ArrayList<Integer>();
+        for(int i = 0; i<limitofcount; i++){
+            arl.add(arlPip.get(i));//use new arl so dont corrupt arlPip
+        }
+        //to solve not finding str8 if pairs, get rid of dups?!
+        // Create a new ArrayList
+        ArrayList<Integer> newList = new ArrayList<Integer>();
+
+        // Traverse through the first list
+        for (int i=0; i<arl.size(); i++) {
+
+            // If this element is not present in newList
+            // then add it
+            if (!newList.contains(arl.get(i))) {
+
+                newList.add(arl.get(i));
+            }
+        }
+        Collections.sort(newList);
+
+        //find A
+         for(int i=0; i<newList.size(); i++){
+            if (newList.get(i)==1){
+                newList.add(14);
+                //limitofcount+=1;
+                //debug
+                lowA = newList.get(i);
+                highA = newList.get(newList.size()-1);
+
+                foundA = true;
+                break;//do once
+            }
+        }
+
+        if(foundA){
+            limitofcount++;//not ndd using dupl-removd list
+        }
+
+        //if pairs in pip run wil not find str8: 5 66 7 8 99 10
+        //                                       1 2F
+        //                                          1 2 3 4F
+        for(int i = 0; i<newList.size()-4; i++){// 6 7 8 9 10
+
+            if(
+                            newList.get(i)+1 == newList.get(i+1)
+                            &&  newList.get(i)+2 == newList.get(i+2)
+                            &&  newList.get(i)+3 == newList.get(i+3)
+                            &&  newList.get(i)+4 == newList.get(i+4)
+                //&&  arl.get(i)+4 == arl.get(i+5)
+
+            ){
+                straight = true;
+                card1=arl.get(i);
+                card2=arl.get(i+1);
+                card3=arl.get(i+2);
+                card4=arl.get(i+3);
+                card5=arl.get(i+4);
+
+            }
+
+        }
+
+        if(straight){
+            com.mygdx.maykornercards.MyStaticItems.Straight2="str8"
+                    //debug
+                    /*
+                    + " " + card1
+                    + " " + card2
+                    + " " + card3
+                    + " " + card4
+                    + " " + card5
+
+                     */
+            ;
+
+            //debug
+            //if(foundA){MyStaticItems.Straight2+= "; " + limitofcount + " " + lowA + " " + highA;}
+        }
+    }
+
+    public void getFullHouse1(ArrayList<Integer> arlPip, int limitofcount) {
+        com.mygdx.maykornercards.MyStaticItems.FullHouse1 = "";
+
+        boolean pair = false;
+        boolean triplet = false;
+        int pair1 = 0;
+        int pair2 = 0;
+        int triplet1 = 0;
+        int triplet2 = 0;
+        int triplet3 = 0;
+
+        //Integer [] tests = new Integer[limitofcount];
+        ArrayList<Integer> arl = new ArrayList<Integer>();
+        for(int i = 0; i<limitofcount; i++){
+            arl.add(arlPip.get(i));//use new arl so dont corrupt arlPip
+        }
+        Collections.sort(arl);
+
+        for(int i = 0; i<limitofcount; i++){// <11
+            if(i<limitofcount-2){// <9
+                if(!pair) {
+                    if (arl.get(i) == arl.get(i + 1) && arl.get(i) != arl.get(i + 2)) {
+                        //debug
+                        //MyStaticItems.FullHouse1 = "2n-2";
+                        pair1 = arl.get(i);
+                        pair2 = arl.get(i+1);
+
+                        pair = true;
+                        //break;
+                    }
+                }
+                if(!triplet) {
+                    if (arl.get(i) == arl.get(i + 1) && arl.get(i) == arl.get(i + 2)) {
+
+                        //debug
+                        //MyStaticItems.FullHouse1 = "3n-2";
+                        triplet1 = arl.get(i);
+                        triplet2 = arl.get(i+1);
+                        triplet3 = arl.get(i+2);
+
+                        //need to skip ahead tho so dont cnt last 2 cards as pair if !pair
+                        if(i+3<limitofcount){i = i + 3;}
+                        else if(i+2<limitofcount){i = i + 2;}
+                        else if(i+1<limitofcount){i = i + 1;}
+
+                        triplet = true;
+                        //break;
+                    }
+                }
+            }
+
+            if(i<limitofcount-1){// <10
+                if(!pair) {
+                    if (arl.get(i) == arl.get(i + 1) /*&& arl.get(i) != arl.get(i+2)*/) {
+                        //debug
+                        //MyStaticItems.FullHouse1 = "2n-1";
+                        pair1 = arl.get(i);
+                        pair2 = arl.get(i+1);
+
+                        pair = true;
+                        //break;
+                    }
+                }
+             }
+        }
+
+        if(pair && triplet) {
+            com.mygdx.maykornercards.MyStaticItems.FullHouse1 = "flhs"
+                    //debug
+                    //+": "+ pair1 + " " + pair1 + " " + triplet1 + " " + triplet2 + " " + triplet3
+            ;
+
+        }
+
+    }
+
+    public void getFullHouse2(ArrayList<Integer> arlPip, int limitofcount) {
+        com.mygdx.maykornercards.MyStaticItems.FullHouse2 = "";
+
+        boolean pair = false;
+        boolean triplet = false;
+        int pair1 = 0;
+        int pair2 = 0;
+        int triplet1 = 0;
+        int triplet2 = 0;
+        int triplet3 = 0;
+
+        //Integer [] tests = new Integer[limitofcount];
+        ArrayList<Integer> arl = new ArrayList<Integer>();
+        for(int i = 0; i<limitofcount; i++){
+            arl.add(arlPip.get(i));//use new arl so dont corrupt arlPip
+        }
+        Collections.sort(arl);
+
+        for(int i = 0; i<limitofcount; i++){// <11
+            if(i<limitofcount-2){// <9
+                if(!pair) {
+                    if (arl.get(i) == arl.get(i + 1) && arl.get(i) != arl.get(i + 2)) {
+                        //debug
+                        //MyStaticItems.FullHouse1 = "2n-2";
+                        pair1 = arl.get(i);
+                        pair2 = arl.get(i+1);
+
+                        pair = true;
+                        //break;
+                    }
+                }
+                if(!triplet) {
+                    if (arl.get(i) == arl.get(i + 1) && arl.get(i) == arl.get(i + 2)) {
+
+                        //debug
+                        //MyStaticItems.FullHouse1 = "3n-2";
+                        triplet1 = arl.get(i);
+                        triplet2 = arl.get(i+1);
+                        triplet3 = arl.get(i+2);
+
+                        //need to skip ahead tho so dont cnt last 2 cards as pair if !pair
+                        if(i+3<limitofcount){i = i + 3;}
+                        else if(i+2<limitofcount){i = i + 2;}
+                        else if(i+1<limitofcount){i = i + 1;}
+
+                        triplet = true;
+                        //break;
+                    }
+                }
+            }
+
+            if(i<limitofcount-1){// <10
+                if(!pair) {
+                    if (arl.get(i) == arl.get(i + 1) /*&& arl.get(i) != arl.get(i+2)*/) {
+                        //debug
+                        //MyStaticItems.FullHouse1 = "2n-1";
+                        pair1 = arl.get(i);
+                        pair2 = arl.get(i+1);
+
+                        pair = true;
+                        //break;
+                    }
+                }
+            }
+        }
+
+        if(pair && triplet) {
+            com.mygdx.maykornercards.MyStaticItems.FullHouse2 = "flhs"
+            //debug
+            //+": "+ pair1 + " " + pair1 + " " + triplet1 + " " + triplet2 + " " + triplet3
+            ;
+
+        }
+
+    }
+
+    public Sprite[] sortbySuit(TextureAtlas atlas, Sprite[] spritearray, ArrayList<String> arlSuit, ArrayList<Integer> arlPip, int end) {
+
+        //-----SORTING-----
+        ArrayList<Integer> arlcompanion = new ArrayList<Integer>();
+        ArrayList<String> arltobesortedWithIndices = new ArrayList<String>();
+        ArrayList<String> arlSuitforDiamondColorTest = new ArrayList<String>();
+
+        for(int i=0; i<end; i++){
+            arlSuitforDiamondColorTest.add(arlSuit.get(i));
+        }
+
+        boolean club = false;
+        boolean heart = false;
+        boolean spade = false;
+        boolean diamond = false;
+         for(int i=0;i<end; i++){
+             //*****handle red
+             //sep diamonds from hearst (sort if all suits= C H D S [becomes C H S D] so can distinct better by eye
+             if(arlSuitforDiamondColorTest.get(i).equalsIgnoreCase("diamonds")){
+                 arlSuitforDiamondColorTest.set(i,"zdiamonds");
+                 diamond = true;
+             }
+             //handle the 3 mix not separated? (see belo)
+             else if(arlSuit.get(i).equalsIgnoreCase("spades")){
+                 spade = true;
+             }
+             else if(arlSuit.get(i).equalsIgnoreCase("hearts")){
+                 heart = true;
+             }else if(arlSuit.get(i).equalsIgnoreCase("clubs")){
+                 club = true;
+             }
+             //handl red
+             //*****abv hndls sep colors except for C S D! or C H D!
+
+            arltobesortedWithIndices.add(arlSuitforDiamondColorTest.get(i)+","+i);
+            arlcompanion.add(arlPip.get(i));//hold origindexofcompanion in itself
+        }
+        Collections.sort(arltobesortedWithIndices);//need to sort their indices at same time as when sorting the arl
+
+        //*****more color handling..1) undo red-diamonds..2)-x) handl other colors-3suit collections
+        //undo red
+        ArrayList<String> arlcolor = new ArrayList<String>();
+        String color = "";
+        int indexcolor = 0;
+        for(int i=0;i<end; i++) {
+            //sep diamonds from hearst (sort if all suits= C H D S [becomes C H S D] so can distinct better by eye
+            arlcolor = Split(arltobesortedWithIndices.get(i), ",");
+            color = arlcolor.get(0);
+            indexcolor = Integer.valueOf(arlcolor.get(1));
+            if (color.equalsIgnoreCase("zdiamonds")) {
+                arltobesortedWithIndices.set(i, "diamonds"+","+indexcolor);
+            }
+        }
+        //*****
+        //abv hndls sep colors except for C S D! or C H D!
+        if(/*club && spade && diamond && */!heart){//club after (resorted 'z')diamond to sep fr spade
+            for(int i=0; i<end; i++){
+                arlcolor = Split(arltobesortedWithIndices.get(i), ",");
+                color = arlcolor.get(0);
+                indexcolor = Integer.valueOf(arlcolor.get(1));
+                if (color.equalsIgnoreCase("spades")) {
+                    arltobesortedWithIndices.set(i, "zspades"+","+indexcolor);
+                }
+            }
+            Collections.sort(arltobesortedWithIndices);
+            //undo
+            for(int i=0;i<end; i++) {
+                //sep diamonds from hearst (sort if all suits= C H D S [becomes C H S D] so can distinct better by eye
+                arlcolor = Split(arltobesortedWithIndices.get(i), ",");
+                color = arlcolor.get(0);
+                indexcolor = Integer.valueOf(arlcolor.get(1));
+                if (color.equalsIgnoreCase("zspades")) {
+                    arltobesortedWithIndices.set(i, "spades"+","+indexcolor);
+                }
+            }
+        }
+        if(/*club && heart && diamond && */!spade){
+            for(int i=0; i<end; i++){
+                arlcolor = Split(arltobesortedWithIndices.get(i), ",");
+                color = arlcolor.get(0);
+                indexcolor = Integer.valueOf(arlcolor.get(1));
+                if (color.equalsIgnoreCase("clubs")) {
+                    arltobesortedWithIndices.set(i, "eclubs"+","+indexcolor);//after newly set-after-sorting=diamonds
+                }
+            }
+            Collections.sort(arltobesortedWithIndices);
+            //undo
+            for(int i=0;i<end; i++) {
+                //sep diamonds from hearst (sort if all suits= C H D S [becomes C H S D] so can distinct better by eye
+                arlcolor = Split(arltobesortedWithIndices.get(i), ",");
+                color = arlcolor.get(0);
+                indexcolor = Integer.valueOf(arlcolor.get(1));
+                if (color.equalsIgnoreCase("eclubs")) {
+                    arltobesortedWithIndices.set(i, "clubs"+","+indexcolor);
+                }
+            }
+        }
+       // if(game.debug){System.out.println(club + " " + heart + " " + spade + " " + diamond);}
+        //*****more color handling..1) undo red-diamonds..2)-x) handl other colors-3suit collections
+        //-----SORTING-----
+
+        Sprite[] originalsprites = new Sprite[end];
+        ArrayList<Float> originalspriteX = new ArrayList<Float>();
+        ArrayList<Float> originalspriteY = new ArrayList<Float>();
+        Sprite[] newsprites = new Sprite[end];
+
+        for(int i=0; i<end; i++){
+            originalsprites[i] = spritearray[i];//all 26 cars... how to get 2nd set? picture=OK, butX,Y are from idt set of 26
+            originalspriteX.add(spritearray[i].getX());
+            originalspriteY.add(spritearray[i].getY());
+        }
+
+        //recollect the suits, companions
+        ArrayList<String> arl = new ArrayList<String>();
+        String sorted = "";
+        int index = 0;
+        int companion = 0;
+        Sprite sprite = new Sprite();
+        for(int i=0; i<end; i++){
+            arl = Split(arltobesortedWithIndices.get(i), ",");
+            sorted = arl.get(0);
+            index = Integer.valueOf(arl.get(1));//OLD index of sorted items
+            companion = arlcompanion.get(index);//get the orig compnaion by the OLD index (its old index matches the presorted index)
+
+            //create new sprites with newsorts, and companions-matching AND orig sprietearray-X.Y
+            newsprites[i] = createcardsprite(atlas, newsprites[i], sorted, companion, originalspriteX.get(i), originalspriteY.get(i));
+
+        }
+
+        return newsprites;
+    }
+
+    public Sprite[] sortbyPip(TextureAtlas atlas, Sprite[] spritearray, ArrayList<Integer> arlPip, ArrayList<String> arlSuit,  int end) {
+
+        //-----SORTING-----
+        ArrayList<String> arlcompanion = new ArrayList<String>();
+        ArrayList<String> arltobesortedWithIndices = new ArrayList<String>();
+        ArrayList<Integer> arlpiptobesorted = new ArrayList<Integer>();
+
+        for(int i=0;i<end; i++){
+            arlpiptobesorted.add(arlPip.get(i));
+        }
+
+        ArrayList<String>  arlfromsort = new ArrayList<String>();
+        for(int i=0;i<end; i++) {//sort 1 10 11 12 13 then 2 3 4...as strings
+
+            if(arlpiptobesorted.get(i)==1){
+                arlpiptobesorted.set(i, 94);//abv 2=two! and abv 9=nine! 1 2 3 4 5 6 7 8 9
+                //if(game.debug){System.out.println(arlpiptobesorted.get(i));}
+            }
+            //A always to far left on row1 - why?
+            //but 10,j,q,k sorted acesdening from far left (90's before 2 3 4...)
+            //and numbers acesending AFTAR A,10-pic-section
+            if(arlpiptobesorted.get(i)==10){
+                arlpiptobesorted.set(i, 90);
+                //if(debug){System.out.println(arlpiptobesorted.get(i));}
+            }
+            if(arlpiptobesorted.get(i)==11){
+                arlpiptobesorted.set(i, 91);
+            }
+            if(arlpiptobesorted.get(i)==12){
+                arlpiptobesorted.set(i, 92);
+            }
+            if(arlpiptobesorted.get(i)==13){
+                arlpiptobesorted.set(i, 93);
+            }
+
+
+            arltobesortedWithIndices.add(/*arlPip.get(i)*/arlpiptobesorted.get(i)+","+i);
+            arlcompanion.add(arlSuit.get(i));//hold origindexofcompanion in itself
+        }
+        Collections.sort(arltobesortedWithIndices);//sort 1 10 11 12 13 then 2 3 4...as strings
+
+        //undo pipvalues//ndd? if not arlpip abv in add to arltobesortedwithindices?
+        int pipfromsort = 0;
+        int indexfromsort = 0;
+        for(int i=0; i<end; i++){
+            arlfromsort = Split(arltobesortedWithIndices.get(i),",");
+            pipfromsort = Integer.valueOf(arlfromsort.get(0));
+            indexfromsort = Integer.valueOf(arlfromsort.get(1));
+
+            if(pipfromsort==94){
+                arltobesortedWithIndices.set(i, "1" +","+indexfromsort);
+            }
+            if(pipfromsort==90){
+                arltobesortedWithIndices.set(i, "10" +","+indexfromsort);
+            }
+            if(pipfromsort==91){
+                arltobesortedWithIndices.set(i, "11" +","+indexfromsort);
+            }
+            if(pipfromsort==92){
+                arltobesortedWithIndices.set(i, "12" +","+indexfromsort);
+            }
+            if(pipfromsort==93){
+                arltobesortedWithIndices.set(i, "13" +","+indexfromsort);
+            }
+        }
+        //-----SORTING-----
+
+        Sprite[] originalsprites = new Sprite[end];
+        ArrayList<Float> originalspriteX = new ArrayList<Float>();
+        ArrayList<Float> originalspriteY = new ArrayList<Float>();
+        Sprite[] newsprites = new Sprite[end];
+
+        for(int i=0; i<end; i++){
+            //if(debug){System.out.println(i);}
+            originalsprites[i] = spritearray[i];//all 26 cars... how to get 2nd set? picture=OK, butX,Y are from idt set of 26
+            originalspriteX.add(spritearray[i].getX());
+            originalspriteY.add(spritearray[i].getY());
+        }
+
+
+        //recollect the suits, companions
+        ArrayList<String> arl = new ArrayList<String>();
+        int sorted = 0;
+        int index = 0;
+        String companion = "";
+        Sprite sprite = new Sprite();
+        for(int i=0; i<end; i++){
+            arl = Split(arltobesortedWithIndices.get(i), ",");
+            sorted = Integer.valueOf(arl.get(0));
+            index = Integer.valueOf(arl.get(1));//OLD index of sorted items
+            companion = arlcompanion.get(index);//get the orig compnaion by the OLD index (its old index matches the presorted index)
+
+            //create new sprites with newsorts, and companions-matching AND orig sprietearray-X.Y
+            newsprites[i] = createcardsprite(atlas, newsprites[i], companion, sorted, originalspriteX.get(i), originalspriteY.get(i));
+
+        }
+
+        return newsprites;
+
+    }
+
+    public Sprite[] callsortbySuit(ArrayList<String> arlSuit, ArrayList<Integer> arlPip, int halfspritearrayStartindex, float cardx, float overlap, int debugwhilecounter, Sprite[] spritearray, TextureAtlas atlas){
+
+        Sprite[] halfspritearray = new Sprite[com.mygdx.maykornercards.MyStaticItems.standarddeck / 2];
+        for (int i = com.mygdx.maykornercards.MyStaticItems.standarddeck / 2; i < com.mygdx.maykornercards.MyStaticItems.standarddeck; i++) {//just 1/2 cars from right
+            if (cardx + overlap > 0) {
+                //spritearray[i].draw(game.batch);//dont draw yet, just count debuwhile so get # cards
+                debugwhilecounter += 1;
+                cardx -= com.mygdx.maykornercards.MyStaticItems.cardwidth;
+                overlap += com.mygdx.maykornercards.MyStaticItems.cardoverlap;
+                //if(game.debug){System.out.println(spritearray[i].getX());}
+
+                //create new sprite array of JUST these 26 cars from left OR from right
+                halfspritearray[halfspritearrayStartindex/*i - MyStaticItems.standarddeck / 2*/] = spritearray[i];//!!
+            }
+        }
+
+        //use new arls so dont corrupt orig arlSuit or arlPip
+
+        //resets
+        cardx = Gdx.graphics.getWidth() - com.mygdx.maykornercards.MyStaticItems.cardwidth;
+        overlap = com.mygdx.maykornercards.MyStaticItems.cardoverlap;
+        cardx -= com.mygdx.maykornercards.MyStaticItems.cardwidth;
+
+        //arl that can be sorted is arlSuit|Pip
+        //arl that is the deaalable-showable sprites is spritearray
+        Sprite[] sortedsprite = sortbySuit(atlas, halfspritearray, /*MyStaticItems.arlSuit2*/arlSuit, /*MyStaticItems.arlPip2*/arlPip, debugwhilecounter - 1);
+
+        return sortedsprite;
+    }
+
+    public Sprite[] callsortbyPip(ArrayList<Integer> arlPip, ArrayList<String> arlSuit, int halfspritearrayStartindex, float cardx, float overlap, int debugwhilecounter, Sprite[] spritearray, TextureAtlas atlas){
+
+        Sprite[] halfspritearray = new Sprite[com.mygdx.maykornercards.MyStaticItems.standarddeck / 2];
+        for (int i = 0; i < com.mygdx.maykornercards.MyStaticItems.standarddeck / 2; i++) {//just 1/2 cars from left
+            if (cardx - overlap + com.mygdx.maykornercards.MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                //spritearray[i].draw(game.batch);//dont draw yet, just count debuwhile so get # cards
+                debugwhilecounter += 1;
+                cardx += com.mygdx.maykornercards.MyStaticItems.cardwidth;
+                overlap += com.mygdx.maykornercards.MyStaticItems.cardoverlap;
+                //if(game.debug){System.out.println(spritearray[i].getX());}
+
+                //create new sprite array of JUST these 26 cars from left OR from right
+                halfspritearray[halfspritearrayStartindex/*i*/] = spritearray[i];
+            }
+        }
+
+        //use new arls so dont corrupt orig arlSuit or arlPip
+
+        //resets
+        cardx = 0;
+        overlap = com.mygdx.maykornercards.MyStaticItems.cardoverlap;
+        cardx += com.mygdx.maykornercards.MyStaticItems.cardwidth;//where back is drawn
+
+        //arl that can be sorted is arlSuit|Pip
+        //arl that is the deaalable-showable sprites is spritearray
+        Sprite[] sortedsprite = sortbyPip(atlas, halfspritearray, /*MyStaticItems.arlPip1*/arlPip, /*MyStaticItems.arlSuit1*/arlSuit, debugwhilecounter - 1);
+
+        return sortedsprite;
+    }
+
+    public Sprite[] doShuffle(int start, int end, TextureAtlas atlas, List givenListAllCards, float cardx, float cardy, float overlap,
+                              Sprite[] spritearray, Float[] spriteXarray, Float[] spriteYarray, Random rand,
+                              String element,
+                                      ArrayList<String> arl,
+                                      String suit,
+                                      int pip, ArrayList<String> arlSuit, ArrayList<Integer> arlPip
+    ){
+
+        for (int i = /*0*/start; i < /*MyStaticItems.standarddeck/2*/end; i++) {//just 1/2 cars from left
+            //int randomIndexSuit = rand.nextInt(givenListSuit.size());
+            //int randomIndexPip = rand.nextInt(pipList.get(randomIndexSuit).size());
+
+            int randomIndexCard = rand.nextInt(givenListAllCards.size());
+            element = (String) givenListAllCards.get(randomIndexCard);
+            arl = MyFactoryScreen.Split(element, ",");
+            suit = arl.get(0);
+            pip = Integer.valueOf(arl.get(1));
+
+            //how to ck that this suit.pip is still avail after remove()?
+            spritearray[i] = createcardsprite(atlas, spritearray[i],
+                    suit,
+                    pip,
+                    cardx - overlap, cardy);
+            /*MyStaticItems.arlSuit1*/arlSuit.add(suit);
+            /*MyStaticItems.arlPip1*/arlPip.add(pip);
+
+            //how to remove pip fot THIS suit and not remove it for the other suits?
+            // pipList.get(randomIndexSuit).remove(randomIndexPip);
+            givenListAllCards.remove(randomIndexCard);
+
+            spriteXarray[i] = cardx - overlap;
+            spriteYarray[i] = cardy;
+            cardx += com.mygdx.maykornercards.MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+            //if(game.debug){System.out.println(spritearray[i].getX());}
+        }
+
+        return spritearray;
+    }
+}

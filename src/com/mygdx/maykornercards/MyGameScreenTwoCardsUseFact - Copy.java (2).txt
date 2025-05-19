@@ -1,0 +1,556 @@
+package com.mygdx.game;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
+public class MyGameScreenTwoCardsUseFact extends ScreenAdapter {
+
+    MyGdxGameTwo game;
+
+    TextureAtlas atlas;
+
+
+    Sprite
+            front1, front2, front3, front4, front5, front6, front7, front8, front9, front10, front11, front12, front13,
+            //row2
+            front21, front22, front23, front24, front25, front26, front27, front28, front29, front210, front211, front212, front213,
+                    //all cards
+                    front31, front32, front33, front34, front35, front36, front37, front38, front39, front310, front311, front312, front313,
+
+    front41, front42, front43, front44, front45, front46, front47, front48, front49, front410, front411, front412, front413
+
+            ;
+
+     Sprite[] spritearray = new Sprite[]{front1, front2, front3, front4, front5, front6, front7, front8, front9, front10, front11, front12, front13,
+            /*row2*/
+            front21, front22, front23, front24, front25, front26, front27, front28, front29, front210, front211, front212, front213,
+            //all cards
+            front31, front32, front33, front34, front35, front36, front37, front38, front39, front310, front311, front312, front313,
+
+            front41, front42, front43, front44, front45, front46, front47, front48, front49, front410, front411, front412, front413};
+     Float[] spriteXarray = new Float[MyStaticItems.standarddeck];
+     Float[] spriteYarray = new Float[MyStaticItems.standarddeck];
+     //Float[] spriteWarray = new Float[52];//use static.cardw
+     //Float[] spriteHarray = new Float[52];//use static.carh
+
+     Sprite back1, back21/*, back3, back4, back5, back6, back7*/;
+
+     OrthographicCamera cam;
+
+    MyFactoryScreen myfactoryscreen;
+
+    float cardx;
+    float cardy;
+    float overlap;
+
+    public MyGameScreenTwoCardsUseFact(final MyGdxGameTwo game) {
+
+        this.game = game;
+        myfactoryscreen = new MyFactoryScreen(game);
+
+    }
+
+    @Override
+    public void show() {
+
+        Gdx.input.setInputProcessor(new InputAdapter() {
+            @Override
+            public boolean touchDown(int x, int y, int pointer, int button) {
+                int renderY = Gdx.graphics.getHeight() - y;//why - y?: cause touch is y-down but items are drawn y-up!
+
+                game.debugrenderY = renderY;
+                game.debugx = x;
+                game.debugy = y;
+
+                //static items-----
+                //exit
+                if (x>Gdx.graphics.getWidth()-MyStaticItems.exit.getWidth()
+                        &&
+                        renderY>Gdx.graphics.getHeight()-MyStaticItems.exit.getHeight())
+                {
+                    //myfactoryscreen.writeData("test","test.csv");//if no owkr fone dont use! see myfactscrn
+
+                    Gdx.app.exit();
+                }
+
+                //continue
+                if (x>Gdx.graphics.getWidth()-MyStaticItems.continuation.getWidth()
+                        &&
+                        renderY<MyStaticItems.continuation.getHeight())
+                {
+                    game.setScreen(new MyGameScreenTwoCardsUseFact(game));
+                }
+
+                //trademark
+                if (x<MyStaticItems.trademark.getWidth()
+                        &&
+                        renderY<MyStaticItems.trademark.getHeight())
+                {
+                    // MyStaticItems.ahahah.stop();
+                    game.setScreen(new MyGameScreenTwo(game));
+
+
+                }
+
+
+                return true;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                int renderY = Gdx.graphics.getHeight() - screenY;//why - y?: cause touch is y-down but items are drawn y-up!
+                game.debugscreenX = screenX;
+                game.debugscreenY = screenY;
+
+
+                return super.touchDragged(screenX, screenY, pointer);
+
+            }
+        });
+
+        //--------------------------------------------cards--------------------------------------------
+        atlas = /*new TextureAtlas("carddeck.atlas")*/MyStaticItems.atlas;
+
+        //pixel perfect bwlo; must acct for smaller resolves on fone, using Gdx.g...getWidth -> see tests in render!
+        //no nd 4 height test all screesn can hold 2 cardheights, set at
+        //  Mystatixitmes public static int cardrowmax = 2;
+
+        //deal from left
+        cardx = 0;
+        cardy = Gdx.graphics.getHeight()/2-MyStaticItems.cardheight/2+game.heightfrombottom*2;
+        overlap = MyStaticItems.cardoverlap;
+
+        back1 = myfactoryscreen.createcardsprite(atlas, back1, "back", 2, cardx, cardy);
+        cardx += MyStaticItems.cardwidth;
+        //overlap += MyStaticItems.cardoverlap;//1st overlp is belo
+
+
+        for (int i = 0; i < MyStaticItems.standarddeck/2; i++) {//just 1/2 cars from left
+            spritearray[i] = myfactoryscreen.createcardsprite(atlas, spritearray[i], "clubs", 3, cardx - overlap, cardy);
+            spriteXarray[i] = cardx - overlap;
+            spriteYarray[i] = cardy;
+            cardx += MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+            //if(game.debug){System.out.println(spritearray[i].getX());}
+        }
+
+/*
+        front2 = myfactoryscreen.createcardsprite(atlas, front2, "clubs", 3, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front3 = myfactoryscreen.createcardsprite(atlas, front3, "hearts", 6, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front4 = myfactoryscreen.createcardsprite(atlas, front4,"diamonds", 10, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front5 = myfactoryscreen.createcardsprite(atlas, front5,"clubs", 11, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front6 = myfactoryscreen.createcardsprite(atlas, front6,"spades", 1, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front7 = myfactoryscreen.createcardsprite(atlas, front7,"clubs", 12, cardx-overlap, cardy);
+        //after 7 cards (1back + 6 front no more cards can fit across screen- on fone)
+
+        //repeats to test while test
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front8 = myfactoryscreen.createcardsprite(atlas, front8,"diamonds", 8, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front9 = myfactoryscreen.createcardsprite(atlas, front9,"diamonds", 9, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front10 = myfactoryscreen.createcardsprite(atlas, front10,"diamonds", 10, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front11 = myfactoryscreen.createcardsprite(atlas, front11,"diamonds", 11, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front12 = myfactoryscreen.createcardsprite(atlas, front12,"diamonds", 12, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front13 = myfactoryscreen.createcardsprite(atlas, front13,"diamonds", 13, cardx-overlap, cardy);
+        cardx += MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        //repeats to test while test
+*/
+
+        //row2, deal from right------------------------------
+        cardx = Gdx.graphics.getWidth()-MyStaticItems.cardwidth;
+        cardy = Gdx.graphics.getHeight()/2-MyStaticItems.cardheight/*-game.heightfrombottom*/+game.heightfrombottom*5;
+        overlap = MyStaticItems.cardoverlap;
+
+        back21 = myfactoryscreen.createcardsprite(atlas, back21,"back", 2, cardx, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        //overlap += MyStaticItems.cardoverlap;//1st overlp is belo
+
+        for (int i = 25; i < MyStaticItems.standarddeck; i++) {//just 1/2 cars from right
+            spritearray[i] = myfactoryscreen.createcardsprite(atlas, spritearray[i], "hearts", 9, cardx + overlap, cardy);
+            spriteXarray[i] = cardx - overlap;
+            spriteYarray[i] = cardy;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+            //if(game.debug){System.out.println(spritearray[i].getX());}
+        }
+
+/*
+        front22 = myfactoryscreen.createcardsprite(atlas, front22,"clubs", 3, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front23 = myfactoryscreen.createcardsprite(atlas, front23,"hearts", 6, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front24 = myfactoryscreen.createcardsprite(atlas, front24,"diamonds", 10, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front25 = myfactoryscreen.createcardsprite(atlas, front25,"clubs", 11, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front26 = myfactoryscreen.createcardsprite(atlas, front26,"spades", 1, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front27 = myfactoryscreen.createcardsprite(atlas, front27,"clubs", 12, cardx+overlap, cardy);
+         //after 7 cards (1back + 6 front no more cards can fit across screen- on fone)
+
+        //repeats to test while test
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front28 = myfactoryscreen.createcardsprite(atlas, front28,"diamonds", 8, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front29 = myfactoryscreen.createcardsprite(atlas, front29,"diamonds", 9, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front210 = myfactoryscreen.createcardsprite(atlas, front210,"diamonds", 10, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front211 = myfactoryscreen.createcardsprite(atlas, front211,"diamonds", 11, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front212 = myfactoryscreen.createcardsprite(atlas, front212,"diamonds", 12, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        front213 = myfactoryscreen.createcardsprite(atlas, front213,"diamonds", 11, cardx+overlap, cardy);
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+
+        //repeats to test while test
+*/
+
+        cam = new OrthographicCamera();
+
+
+    }
+    @Override
+    public void render(float delta) {
+
+
+        Gdx.gl.glClearColor(0, 0, .25f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        //draw static items (standard for all screens)
+        game.batch.begin();
+        game.batch.draw(MyStaticItems.trademark, 0, 0);
+        game.batch.draw(MyStaticItems.exit,
+                Gdx.graphics.getWidth()-MyStaticItems.exit.getWidth(),
+                Gdx.graphics.getHeight()-MyStaticItems.exit.getHeight());
+        game.batch.draw(MyStaticItems.continuation,
+                Gdx.graphics.getWidth()-MyStaticItems.continuation.getWidth(),
+                0);
+        game.font.draw(game.batch, MyStaticItems.cardgame, 0, Gdx.graphics.getHeight());
+        //game.batch.draw(MyStaticItems.sshh,0,Gdx.graphics.getHeight()/2/*-MyStaticItems.sshh.getHeight()/2*/);
+        //game.batch.draw(MyStaticItems.center,0,Gdx.graphics.getHeight()/2-MyStaticItems.center.getHeight());
+
+        //debug
+        int debugwhilecounter1;
+        int debugwhilecounter2;
+
+        game.batch.draw(MyStaticItems.deal, Gdx.graphics.getWidth()/2-MyStaticItems.file.getWidth()/2,game.heightfrombottom);
+
+        game.batch.end();
+
+        //draw game
+        //game.batch.setProjectionMatrix(cam.combined);
+
+        //--------------------------------------------cards--------------------------------------------
+        cardx = 0;
+       // cardy = Gdx.graphics.getHeight()/2;
+        overlap = MyStaticItems.cardoverlap;
+
+ //       while (cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()
+ //               &&
+ //               cardy-overlap+MyStaticItems.cardheight < Gdx.graphics.getHeight()){
+
+        game.batch.begin();
+            debugwhilecounter1 = 0;
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                back1.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                //overlap += MyStaticItems.cardoverlap;//1st overlp is belo
+            }
+
+        for (int i = 0; i < MyStaticItems.standarddeck/2; i++) {//just 1/2 cars from left
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                spritearray[i].draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+                //if(game.debug){System.out.println(spritearray[i].getX());}
+            }
+        }
+
+/*
+        if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front2.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front3.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front4.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front5.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front6.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front7.draw(game.batch);
+            }
+
+        //repeats to test while test
+            debugwhilecounter1 += 1;
+            cardx += MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front8.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front9.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front10.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front11.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front12.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            if(cardx-overlap+MyStaticItems.cardwidth < Gdx.graphics.getWidth()) {
+                front13.draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx += MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+            }
+            //repeats to test while test
+*/
+
+        //row2, deal from right------------------------------
+        cardx = Gdx.graphics.getWidth()-MyStaticItems.cardwidth;
+        overlap = MyStaticItems.cardoverlap;
+
+
+        debugwhilecounter2 = 0;
+        if(cardx+overlap > 0) {
+            back21.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            //overlap += MyStaticItems.cardoverlap;//1st overlp is belo
+        }
+
+        for (int i = 25; i < MyStaticItems.standarddeck; i++) {//just 1/2 cars from left
+            if(cardx+overlap > 0) {
+                spritearray[i].draw(game.batch);
+                debugwhilecounter1 += 1;
+                cardx -= MyStaticItems.cardwidth;
+                overlap += MyStaticItems.cardoverlap;
+                //if(game.debug){System.out.println(spritearray[i].getX());}
+            }
+        }
+/*
+        if(cardx+overlap > 0) {
+            front22.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front23.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front24.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front25.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front26.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front27.draw(game.batch);
+        }
+
+        //repeats to test while test
+        debugwhilecounter2+=1;
+        cardx -= MyStaticItems.cardwidth;
+        overlap += MyStaticItems.cardoverlap;
+        if(cardx+overlap > 0) {
+            front28.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front29.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front210.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front211.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front212.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        if(cardx+overlap > 0) {
+            front213.draw(game.batch);
+            debugwhilecounter2 += 1;
+            cardx -= MyStaticItems.cardwidth;
+            overlap += MyStaticItems.cardoverlap;
+        }
+        //repeats to test while test
+*/
+
+
+        game.batch.end();
+
+        game.batch.begin();
+        if(game.debug){//at bot cause to caputer variable changes in while abv
+            game.newfont3.draw(game.batch, myfactoryscreen.getdebug()
+                            +" cw: " + cardx + " ovl: " + MyStaticItems.cardoverlap + " co: " + overlap + " dbc: " + debugwhilecounter1 +"," + debugwhilecounter2
+                    + " testw: " + /*(cardx-overlap+MyStaticItems.cardwidth)*/(cardx+overlap/*+MyStaticItems.cardwidth*/)
+
+                    ,
+                    0, Gdx.graphics.getHeight() - game.heightfrombottom*MyStaticItems.debugheightfactor);
+        }
+        game.batch.end();
+
+
+    }
+
+    @Override
+    /*
+    The viewportWidth and viewportHeight properties of the Camera class define the portion of the world, in world units,
+    that the camera sees. Unfortunately the term "viewport" is often used in two different ways: the portion of the world
+    (in world units) the camera sees and the portion of the screen (in pixels) is being rendered onto.
+    These are two different things, make sure to understand the difference.
+     */
+    public void resize(int width, int height) {
+
+        if (width > height) {
+            cam.viewportHeight = MyStaticItems.MINIMUM_VIEWPORT_SIZE;
+            cam.viewportWidth = cam.viewportHeight * (float)width / (float)height;
+        } else {
+            cam.viewportWidth = MyStaticItems.MINIMUM_VIEWPORT_SIZE;
+            cam.viewportHeight = cam.viewportWidth * (float)height / (float)width;
+        }
+        //cam.update();
+    }
+
+    public void dispose(){
+        atlas.dispose();
+    }
+
+    @Override
+    public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
+
+}
